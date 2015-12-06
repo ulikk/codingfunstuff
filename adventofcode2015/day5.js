@@ -38,9 +38,32 @@ function isNice(s)
   return true;
 }
 
+function isNice2(s)
+{
+  // test pairs
+  var hasPair = false;
+  for (var i=0; i<s.length-1; ++i)
+  {
+    var t = s[i] + s[i+1];
+    if (s.lastIndexOf(t) > (i+1))
+    {
+      hasPair=true; 
+      break;
+    }    
+  }
+  if (!hasPair) return false;
+  
+  for (var i=0; i<s.length-2; ++i)
+  {
+    if (s[i] == s[i+2]) 
+          return true;
+  }
+  return false;
+}
+
 function test(s) 
 {
-  console.log(s + " is " + (isNice(s) ? "nice" : "naughty") );
+  console.log(s + " is " + (isNice2(s) ? "nice" : "naughty") );
 }
 
 //test("ugknbfddgicrmopn");
@@ -48,10 +71,15 @@ function test(s)
 //test("jchzalrnumimnmhp");
 //test("haegwjzuvuyypxyu");
 //test("dvszwmarrgswjxmb");
+test("qjhvhtzxzqqjkmpb");
+test("xxyxx");
+test("uurcxstgmygtbstg");
+test("ieodomkazucvgmuy");
+
 
 var arenice=0;
 input.forEach(function(s) {
-  if (isNice(s)) 
+  if (isNice2(s)) 
     arenice++;
 });
 console.log(arenice + " are nice.");

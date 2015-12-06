@@ -7,10 +7,6 @@ var input = fs.readFileSync('day3-input.txt', 'UTF8');
 
 // delivered presents storage delivered[x][y]
 var delivered = {};
-var pos = {
-  'x' : 0,
-  'y' : 0
-};
 
 function deliverPresent(p)
 {
@@ -26,10 +22,19 @@ function deliverPresent(p)
   }
 }
 
-function deliver(p, path)
+function deliver(path)
 {
+  var posSanta = { 'x' : 0, 'y' : 0 };
+  var posRobotSanta = { 'x' : 0, 'y' : 0 };
+
+  var isRealSanta = true;
+
+  deliverPresent(posSanta);
+  deliverPresent(posRobotSanta);
+
   for (var i = 0, len = path.length; i < len; i++) 
   {
+    var p = isRealSanta ? posSanta : posRobotSanta;
     switch (path[i]) 
     {
       case '^' : p.y=p.y-1; break;
@@ -39,12 +44,15 @@ function deliver(p, path)
       default: console.log('wrong input: c');
     }
     deliverPresent(p);
+    isRealSanta = !isRealSanta;
   }
 }
 
-deliverPresent(pos);
-//deliver(pos, "^v^v^v^v^v");
-deliver(pos, input);
+//deliverPresent(pos);
+//deliver("^v");
+//deliver("^>v<");
+//deliver("^v^v^v^v^v");
+deliver(input);
 
 console.log(JSON.stringify(delivered));
 var total = 0;
@@ -52,3 +60,4 @@ for (var x in delivered) {
   total += Object.keys(delivered[x]).length;
 }
 console.log('total delivered: ' + total);
+
