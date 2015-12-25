@@ -3,7 +3,8 @@ var fs=require('fs');
 
 // Medicine for Rudolph
 
-// var RULES = {
+//  var RULES = {
+//  "e" : ["H", "O"],
 //  "H" : [ "HO", "OH" ],
 //  "O" : [ "HH" ]
 // };
@@ -64,21 +65,39 @@ function allVariations(ruleset, molecule)
       }
     }
   }
-
-  // for (var i = 0; i<tokens.length; ++i) 
-  // {
-  //   // test all variations at this position
-  //   for (var j = 0; j<ruleset[tokens[i]].length; ++j)
-  //   {
-  //      var t = tokens.slice();
-  //      t[i] = ruleset[tokens[i]][j];  // replace
-  //      var molecule = t.join("");
-  //      //console.log("molecule: " + molecule);
-  //      molecules[molecule] = true;
-  //   }
-  // }
   console.log(POS);
   return molecules;
+}
+
+
+var steps=0;
+function parseMolecule(parsestring, grammar)
+{
+  // find first matching replacement
+  for (var lhs in grammar)
+  {
+    for (var i=0; i<grammar[lhs].length; ++i)
+    {
+      var rhs = grammar[lhs][i];
+      var p = parsestring.indexOf(rhs);
+      console.log(parsestring + " match " + rhs + ":" + p);
+      if (lhs=="e" && parsestring==rhs)
+      {
+        return "e";
+      }
+      if ((p>-1) && (lhs!="e"))
+      {
+        // replace and continue
+        steps = steps + 1;
+        console.log(lhs + " -> " + rhs + ":"+parsestring);
+        var repl = parsestring.substring(0,p) + lhs + parsestring.substring(p+rhs.length);
+        return parseMolecule(repl, grammar);
+      }  
+    }
+  }
+  // worng
+  console.log("ERROR couldnt match " + parsestring);
+  return parsestring;
 }
 
 function test(molecule)
@@ -86,6 +105,17 @@ function test(molecule)
   console.log("distinct molecules: " + Object.keys(allVariations(RULES, molecule)).length);
 }
 
+function test2(molecule)
+{
+  steps=1;
+  console.log(parseMolecule(molecule, RULES));
+  console.log("steps: " + steps);
+}
+
+//test2("HOH");
+//test2("HOHOHO")
+test2("CRnCaCaCaSiRnBPTiMgArSiRnSiRnMgArSiRnCaFArTiTiBSiThFYCaFArCaCaSiThCaPBSiThSiThCaCaPTiRnPBSiThRnFArArCaCaSiThCaSiThSiRnMgArCaPTiBPRnFArSiThCaSiRnFArBCaSiRnCaPRnFArPMgYCaFArCaPTiTiTiBPBSiThCaPTiBPBSiRnFArBPBSiRnCaFArBPRnSiRnFArRnSiRnBFArCaFArCaCaCaSiThSiThCaCaPBPTiTiRnFArCaPTiBSiAlArPBCaCaCaCaCaSiRnMgArCaSiThFArThCaSiThCaSiRnCaFYCaSiRnFYFArFArCaSiRnFYFArCaSiRnBPMgArSiThPRnFArCaSiRnFArTiRnSiRnFYFArCaSiRnBFArCaSiRnTiMgArSiThCaSiThCaFArPRnFArSiRnFArTiTiTiTiBCaCaSiRnCaCaFYFArSiThCaPTiBPTiBCaSiThSiRnMgArCaF");
+
 //test("HOH");
 //test("HOHOHO");
-test("CRnCaCaCaSiRnBPTiMgArSiRnSiRnMgArSiRnCaFArTiTiBSiThFYCaFArCaCaSiThCaPBSiThSiThCaCaPTiRnPBSiThRnFArArCaCaSiThCaSiThSiRnMgArCaPTiBPRnFArSiThCaSiRnFArBCaSiRnCaPRnFArPMgYCaFArCaPTiTiTiBPBSiThCaPTiBPBSiRnFArBPBSiRnCaFArBPRnSiRnFArRnSiRnBFArCaFArCaCaCaSiThSiThCaCaPBPTiTiRnFArCaPTiBSiAlArPBCaCaCaCaCaSiRnMgArCaSiThFArThCaSiThCaSiRnCaFYCaSiRnFYFArFArCaSiRnFYFArCaSiRnBPMgArSiThPRnFArCaSiRnFArTiRnSiRnFYFArCaSiRnBFArCaSiRnTiMgArSiThCaSiThCaFArPRnFArSiRnFArTiTiTiTiBCaCaSiRnCaCaFYFArSiThCaPTiBPTiBCaSiThSiRnMgArCaF");
+//test("CRnCaCaCaSiRnBPTiMgArSiRnSiRnMgArSiRnCaFArTiTiBSiThFYCaFArCaCaSiThCaPBSiThSiThCaCaPTiRnPBSiThRnFArArCaCaSiThCaSiThSiRnMgArCaPTiBPRnFArSiThCaSiRnFArBCaSiRnCaPRnFArPMgYCaFArCaPTiTiTiBPBSiThCaPTiBPBSiRnFArBPBSiRnCaFArBPRnSiRnFArRnSiRnBFArCaFArCaCaCaSiThSiThCaCaPBPTiTiRnFArCaPTiBSiAlArPBCaCaCaCaCaSiRnMgArCaSiThFArThCaSiThCaSiRnCaFYCaSiRnFYFArFArCaSiRnFYFArCaSiRnBPMgArSiThPRnFArCaSiRnFArTiRnSiRnFYFArCaSiRnBFArCaSiRnTiMgArSiThCaSiThCaFArPRnFArSiRnFArTiTiTiTiBCaCaSiRnCaCaFYFArSiThCaPTiBPTiBCaSiThSiRnMgArCaF");
