@@ -35,7 +35,7 @@ var SPELLS =
     		enemy.effects["Poison"] = new Effect("Poison", 6, 0, 0,
     			function(chr){
     				chr.HP -= 3;
-    				console.log("poison does 3 dmg to " + chr.name + " remaining HP:"+chr.HP);
+    				//console.log("poison does 3 dmg to " + chr.name + " remaining HP:"+chr.HP);
     			});
     	}
     },
@@ -44,7 +44,7 @@ var SPELLS =
     	'apply' : function(self, enemy){
     		self.effects["Recharge"] = new Effect("Recharge", 5, 0, 0,
     			function(chr){
-    				console.log(chr.name + " recharges 101 mana.");
+    				//console.log(chr.name + " recharges 101 mana.");
     				chr.mana += 101;
     			});
     	}
@@ -59,6 +59,7 @@ function Character(name, hp, damage, armor, mana)
 	this.dmg = damage;
 	this.armor = armor;
     this.mana = mana;
+    this.manaused = 0;
     this.effects = {};
 }
 Character.prototype.getAtt = function(name)
@@ -79,14 +80,14 @@ Character.prototype.processEffects =  function()
 		var e=this.effects[effect];
 		e.turns--;
 		if (e.apply) { 
-			console.log("Applying effect:" + e.name 
-			      + " turns left:" + e.turns);
+			//console.log("Applying effect:" + e.name 
+			//      + " turns left:" + e.turns);
 			e.apply(this); 
 		}
 		if (e.turns == 0)
 		{
 			delete this.effects[effect];
-			console.log(effect + " expired.");
+			//console.log(effect + " expired.");
 		}
 	}
 };
@@ -105,8 +106,8 @@ Character.prototype.toString = function()
 
 function attack(attacker, defender, spell)
 {
-	console.log(attacker + " <> " + defender);
-	console.log("==" + attacker.name + "'s turn ==");
+	//console.log(attacker + " <> " + defender);
+	//console.log("==" + attacker.name + "'s turn ==");
 	var S = SPELLS[spell];
 	var dmg = 0;
 	attacker.processEffects();
@@ -118,12 +119,13 @@ function attack(attacker, defender, spell)
 	if (S)
 	{
 		// see if the spell can be cast
-		console.log(attacker.name + " casts " + spell );
+		//console.log(attacker.name + " casts " + spell );
 		if (attacker.mana < S.mana ) 
 		{
 			return false;	// not enough mana
 		}
 		attacker.mana -= S.mana;
+		attacker.manaused += S.mana;
 		S.apply(attacker, defender);
 	} else {
 		var dmg = attacker.getAtt("dmg") - defender.getAtt("armor");
@@ -131,7 +133,7 @@ function attack(attacker, defender, spell)
 			dmg=1;
 		}
 		defender.HP -= dmg;
-		console.log(attacker.name + " attacks " + defender.name + " for " + dmg + " damage. ");
+		//console.log(attacker.name + " attacks " + defender.name + " for " + dmg + " damage. ");
 	}
 	return true;
 }
@@ -158,6 +160,7 @@ function battle(chr1, chr2, spells)
 	for (var i=0; i<spells.length; ++i)
 	{
 		var spell=spells[i];
+		chr1.HP--;
 		if (!attack(chr1, chr2, spell))
 		{
 			console.log("could not attack.");
@@ -165,18 +168,61 @@ function battle(chr1, chr2, spells)
 		}
 		var winner = checkWin(chr1,chr2);
 		if(winner) return winner;
+		chr1.HP--;
 		attack(chr2, chr1);
 		var winner = checkWin(chr1,chr2);
 		if(winner) return winner;
 	}
+	return null;
 }
 
 
 //battle( new Character("player", 10, 0, 0, 250), 
-//	    new Character("boss", 13, 8, 0, 0),
+//	    new Character("boss",5 13, 8, 0, 0),
 //	['Poison','Magic Missile','Magic Missile','Magic Missile','Magic Missile','Drain','Magic Missile']);
 
-battle( new Character("player", 10, 0, 0, 250), 
-	    new Character("boss", 14, 8, 0, 0),
-	['Recharge','Shield','Drain','Poison','Magic Missile','Drain','Magic Missile']);
+//battle( new Character("player", 10, 0, 0, 250), 
+//	    new Character("boss", 14, 8, 0, 0),
+//	['Recharge','Shield','Drain','Poison','Magic Missile','Drain','Magic Missile']);
 
+function INC(A,p)
+{
+	if (p<A.length){
+		A[p]++;
+		if (A[p] >= 5)
+		{
+			A[p]=0;
+			INC(A,p+1);
+		}
+    }
+}
+
+var best=Number.MAX_VALUE;
+
+
+
+var S=[0,0,0,0,0,0,0,0,0,0,0,0];
+var E=5*5*5*5*5*5*5*5*5;
+for (var N=0;N<E;N++)
+{
+	console.log(S);
+	var player = new Character("player", 50, 0, 0, 500);
+	var boss = new Character("boss", 58, 9, 0, 0);
+	var result=battle( player, boss,
+		S.map(function(e){ return Object.keys(SPELLS)[e]})	
+		);
+	if (result == player)
+	{
+		if (player.manaused < best)
+		{
+			best=player.manaused;
+		}
+	}
+	if (result == null)
+	{
+		console.log('not enough spells.');
+	}
+	// next spell combination
+    INC(S,0);
+}
+console.log('best:' + best);
