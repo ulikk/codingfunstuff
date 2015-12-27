@@ -16,11 +16,16 @@ function toHouse(n)
 }
 
 
-for (var i=1; i<NUMBER; ++i)
+for (var i=100000; i<NUMBER; ++i)
 {
-	//console.log("House " + i + " got " + toHouse(i) + " presents.");
-    if (toHouse(i) == NUMBER)
-    {
+	var presents=toHouse(i);
+
+    if (i%10000==0) {
     	console.log("House " + i + " got " + toHouse(i) + " presents.");
-    }
+	}
+    if (presents == NUMBER)
+    {
+    	console.log("House " + i + " got " + presents + " presents.");
+		break;
+	}
 }
