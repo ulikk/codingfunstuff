@@ -16,7 +16,7 @@ function toHouse(n)
 }
 
 
-for (var i=100000; i<NUMBER; ++i)
+for (var i=900000; i<NUMBER; ++i)
 {
 	var presents=toHouse(i);
 

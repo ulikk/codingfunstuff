@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 
 #define NUMBER 36000000
 
@@ -15,7 +16,8 @@ inline int toHouse(const int n)
 
 int main()
 {
-	for (int i=100000; i<NUMBER; ++i)
+#pragma omp parallel for
+	for (int i=100000; i<1500000; ++i)
 	{
 		int presents=toHouse(i);
 
@@ -24,8 +26,8 @@ int main()
 		}
 	    if (presents == NUMBER)
 	    {
-	    	std::cout << "House " << i << " got " << presents << " presents. **DONE**" << std::endl;
-			break;
-		}
+        std::cout << "House " << i << " got " << presents << " presents. **DONE**" << std::endl;
+        exit(0);
+      }
 	}
 }
